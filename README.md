@@ -5,6 +5,10 @@
 
 ![photo][]
 
+## Schematic
+
+![schematic][]
+
 ## Usage
 
 ### Setup
@@ -63,3 +67,4 @@ limitations under the License.
 ```
 
 [photo]: https://raw.githubusercontent.com/Nilhcem/ledcontrol-androidthings/master/preview.gif
+[schematic]: https://raw.githubusercontent.com/Nilhcem/ledcontrol-androidthings/master/schematic.png
