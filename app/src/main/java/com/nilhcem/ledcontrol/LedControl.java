@@ -191,13 +191,13 @@ public class LedControl implements AutoCloseable {
      * Display a hexadecimal digit on a 7-Segment Display
      *
      * @param digit the position of the digit on the display (0..7)
-     * @param value the value to be displayed. (0x00..0x0F)
+     * @param value the value to be displayed. (0x00..0x0F. 0x10 to clear digit)
      * @param dp    sets the decimal point.
      */
     public void setDigit(int digit, byte value, boolean dp) throws IOException {
         byte v;
 
-        if (digit < 0 || digit > 7 || value > 15) {
+        if (digit < 0 || digit > 7 || value > 16) {
             return;
         }
         v = CHAR_TABLE[value];
