@@ -47,6 +47,33 @@ for (int i = 0; i < invader.length; i++) {
 }
 ```
 
+
+### Show "42.ABCDEF" on a MAX7219 8-digit module
+
+```java
+ledControl.setDigit(7, (byte) 0x04, false);
+ledControl.setDigit(6, (byte) 0x02, true);
+ledControl.setDigit(5, (byte) 0x0A, false);
+ledControl.setDigit(4, (byte) 0x0B, false);
+ledControl.setDigit(3, (byte) 0x0C, false);
+ledControl.setDigit(2, (byte) 0x0D, false);
+ledControl.setDigit(1, (byte) 0x0E, false);
+ledControl.setDigit(0, (byte) 0x0F, false);
+```
+
+
+### Show "123456" on a MAX7219 8-digit module
+
+```java
+int curValue = 123456;
+for (int i = 0; i < 8; i++) {
+    byte value = (byte) ((i != 0 && curValue == 0) ? 16 : (curValue % 10));
+    ledControl.setDigit(i, value, false);
+    curValue /= 10;
+}
+```
+
+
 Credits to [https://learn.adafruit.com/trinket-slash-gemma-space-invader-pendant/animation](https://learn.adafruit.com/trinket-slash-gemma-space-invader-pendant/animation) for the Space invaders animation
 
 
