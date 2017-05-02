@@ -20,6 +20,7 @@ try {
 } catch (IOException e) {
     Log.e(TAG, "Error initializing LED matrix", e);
 }
+// Don't forget to call ledControl.close() when you are done.
 ```
 
 
