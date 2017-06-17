@@ -19,8 +19,8 @@ public class MainActivity extends Activity {
     private LedControl ledControl;
 
     private int index;
-    private final HandlerThread handlerThread = new HandlerThread("FrameThread");
     private Handler handler;
+    private HandlerThread handlerThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +33,7 @@ public class MainActivity extends Activity {
             Log.e(TAG, "Error initializing LED matrix", e);
         }
 
+        handlerThread = new HandlerThread("FrameThread");
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper()) {
             @Override
@@ -80,6 +81,7 @@ public class MainActivity extends Activity {
             Log.e(TAG, "Error closing LED matrix", e);
         } finally {
             handler = null;
+            handlerThread = null;
         }
     }
 }
