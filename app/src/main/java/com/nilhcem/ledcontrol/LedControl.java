@@ -323,6 +323,25 @@ public class LedControl implements AutoCloseable {
     }
 
     /**
+     * Draw the given bitmap to the LED matrix on multiple devices.
+     *
+     * @param bitmap Bitmap to draw
+     * @throws IOException
+     */
+    public void draw(Bitmap bitmap) throws IOException {
+        Bitmap scaled = Bitmap.createScaledBitmap(bitmap, 8 * maxDevices, 8, true);
+        for (int row = 0; row < 8; row++) {
+            for (int curDevice = 0; curDevice < maxDevices; curDevice++) {
+                int value = 0;
+                for (int col = 0; col < 8; col++) {
+                    value |= scaled.getPixel((curDevice * 8) + col, row) == Color.WHITE ? (0x80 >> col) : 0;
+                }
+                setRow(maxDevices - curDevice - 1, row, (byte) value);
+            }
+        }
+    }
+
+    /**
      * Send out a single command to the device
      */
     private void spiTransfer(int addr, byte opcode, int data) throws IOException {
