@@ -15,8 +15,12 @@
 
 ```java
 try {
-    ledControl = new LedControl("SPI0.0");
-    ledControl.setIntensity(1);
+    ledControl = new LedControl("SPI0.0", 1); // second parameter is the number of chained matrices. Here, we only use 1 LED matrix module (8x8).
+    for (int i = 0; i < ledControl.getDeviceCount(); i++) {
+        ledControl.setIntensity(i, 3);
+        ledControl.shutdown(i, false);
+        ledControl.clearDisplay(i);
+    }
 } catch (IOException e) {
     Log.e(TAG, "Error initializing LED matrix", e);
 }
@@ -24,27 +28,27 @@ try {
 ```
 
 
-### Turn on one pixel at {row:2, col:3}
+### Turn on one pixel on matrix #0 at {row:2, col:3}
 
 ```java
-ledControl.setLed(2, 3, true);
+ledControl.setLed(0, 2, 3, true);
 ```
 
 
-### Show a bitmap
+### Show a bitmap on matrix #0
 
 ```java
 Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.smiley);
-ledControl.draw(bmp);
+ledControl.draw(0, bmp);
 ```
 
 
-### Show a space invader
+### Show a space invader on matrix #0
 
 ```java
 byte[] invader = Invaders.ALIEN_1_FRAME_1;
 for (int i = 0; i < invader.length; i++) {
-    ledControl.setRow(i, invader[i]);
+    ledControl.setRow(0, i, invader[i]);
 }
 ```
 
@@ -52,14 +56,14 @@ for (int i = 0; i < invader.length; i++) {
 ### Show "42.ABCDEF" on a MAX7219 8-digit module
 
 ```java
-ledControl.setDigit(7, (byte) 0x04, false);
-ledControl.setDigit(6, (byte) 0x02, true);
-ledControl.setDigit(5, (byte) 0x0A, false);
-ledControl.setDigit(4, (byte) 0x0B, false);
-ledControl.setDigit(3, (byte) 0x0C, false);
-ledControl.setDigit(2, (byte) 0x0D, false);
-ledControl.setDigit(1, (byte) 0x0E, false);
-ledControl.setDigit(0, (byte) 0x0F, false);
+ledControl.setDigit(0, 7, (byte) 0x04, false);
+ledControl.setDigit(0, 6, (byte) 0x02, true);
+ledControl.setDigit(0, 5, (byte) 0x0A, false);
+ledControl.setDigit(0, 4, (byte) 0x0B, false);
+ledControl.setDigit(0, 3, (byte) 0x0C, false);
+ledControl.setDigit(0, 2, (byte) 0x0D, false);
+ledControl.setDigit(0, 1, (byte) 0x0E, false);
+ledControl.setDigit(0, 0, (byte) 0x0F, false);
 ```
 
 
@@ -69,7 +73,7 @@ ledControl.setDigit(0, (byte) 0x0F, false);
 int curValue = 123456;
 for (int i = 0; i < 8; i++) {
     byte value = (byte) ((i != 0 && curValue == 0) ? 16 : (curValue % 10));
-    ledControl.setDigit(i, value, false);
+    ledControl.setDigit(0, i, value, false);
     curValue /= 10;
 }
 ```

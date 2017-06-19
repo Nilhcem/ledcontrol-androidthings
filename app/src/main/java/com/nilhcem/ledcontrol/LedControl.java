@@ -9,7 +9,7 @@ import com.google.android.things.pio.SpiDevice;
 import java.io.IOException;
 
 /**
- * Simplified port of Arduino's LedControl library
+ * Port of Arduino's LedControl library
  */
 public class LedControl implements AutoCloseable {
 
@@ -51,16 +51,18 @@ public class LedControl implements AutoCloseable {
             (byte) 0b00000000, (byte) 0b00000000, (byte) 0b00000000, (byte) 0b00000000, (byte) 0b00000000, (byte) 0b00000000, (byte) 0b00000000, (byte) 0b00000000
     };
 
-
     private SpiDevice spiDevice;
 
     /* The array for shifting the data to the devices */
-    private byte[] spidata = new byte[2];
+    private byte[] spidata = new byte[16];
 
-    /* We keep track of the led-status in this array */
-    private byte[] status = new byte[8];
+    /* We keep track of the led-status for all 8 devices in this array */
+    private byte[] status = new byte[64];
 
-    public LedControl(String spiGpio) throws IOException {
+    /* The maximum number of devices we use */
+    private int maxDevices;
+
+    public LedControl(String spiGpio, int numDevices) throws IOException {
         PeripheralManagerService pioService = new PeripheralManagerService();
         spiDevice = pioService.openSpiDevice(spiGpio);
         spiDevice.setMode(SpiDevice.MODE0);
@@ -68,13 +70,19 @@ public class LedControl implements AutoCloseable {
         spiDevice.setBitsPerWord(8); // 8 BPW
         spiDevice.setBitJustification(false); // MSB first
 
-        spiTransfer(OP_DECODEMODE, 0); // decoding： BCD
-        setScanLimit(7); // scanlimit: 8 LEDs
-        spiTransfer(OP_DISPLAYTEST, 0);
+        maxDevices = numDevices;
+        if (numDevices < 1 || numDevices > 8) {
+            maxDevices = 8;
+        }
 
-        shutdown(false);
-        setIntensity(3);
-        clearDisplay();
+        for (int i = 0; i < maxDevices; i++) {
+            spiTransfer(i, OP_DISPLAYTEST, 0);
+            setScanLimit(i, 7); // scanlimit: 8 LEDs
+            spiTransfer(i, OP_DECODEMODE, 0); // decoding： BCD
+            clearDisplay(i);
+            // we go into shutdown-mode on startup
+            shutdown(i, true);
+        }
     }
 
     @Override
@@ -87,12 +95,26 @@ public class LedControl implements AutoCloseable {
     }
 
     /**
+     * Get the number of devices attached to this LedControl.
+     *
+     * @return the number of devices on this LedControl
+     */
+    public int getDeviceCount() {
+        return maxDevices;
+    }
+
+    /**
      * Set the shutdown (power saving) mode for the device
      *
+     * @param addr   the address of the display to control
      * @param status if true the device goes into power-down mode. Set to false for normal operation.
      */
-    public void shutdown(boolean status) throws IOException {
-        spiTransfer(OP_SHUTDOWN, status ? 0 : 1);
+    public void shutdown(int addr, boolean status) throws IOException {
+        if (addr < 0 || addr >= maxDevices) {
+            return;
+        }
+
+        spiTransfer(addr, OP_SHUTDOWN, status ? 0 : 1);
     }
 
     /**
@@ -101,111 +123,145 @@ public class LedControl implements AutoCloseable {
      * See datasheet for sideeffects of the scanlimit on the brightness of the display
      * </p>
      *
+     * @param addr  the address of the display to control
      * @param limit number of digits to be displayed (1..8)
      */
-    public void setScanLimit(int limit) throws IOException {
+    public void setScanLimit(int addr, int limit) throws IOException {
+        if (addr < 0 || addr >= maxDevices) {
+            return;
+        }
+
         if (limit >= 0 || limit < 8) {
-            spiTransfer(OP_SCANLIMIT, limit);
+            spiTransfer(addr, OP_SCANLIMIT, limit);
         }
     }
 
     /**
      * Set the brightness of the display
      *
+     * @param addr      the address of the display to control
      * @param intensity the brightness of the display. (0..15)
      */
-    public void setIntensity(int intensity) throws IOException {
+    public void setIntensity(int addr, int intensity) throws IOException {
+        if (addr < 0 || addr >= maxDevices) {
+            return;
+        }
+
         if (intensity >= 0 || intensity < 16) {
-            spiTransfer(OP_INTENSITY, intensity);
+            spiTransfer(addr, OP_INTENSITY, intensity);
         }
     }
 
     /**
      * Switch all Leds on the display off
+     *
+     * @param addr the address of the display to control
      */
-    public void clearDisplay() throws IOException {
+    public void clearDisplay(int addr) throws IOException {
+        if (addr < 0 || addr >= maxDevices) {
+            return;
+        }
+
+        int offset = addr * 8;
         for (int i = 0; i < 8; i++) {
-            status[i] = 0;
-            spiTransfer((byte) (i + 1), status[i]);
+            status[offset + i] = 0;
+            spiTransfer(addr, (byte) (OP_DIGIT0 + i), status[offset + i]);
         }
     }
 
     /**
      * Set the status of a single Led
      *
+     * @param addr  the address of the display to control
      * @param row   the row of the Led (0..7)
      * @param col   the column of the Led (0..7)
      * @param state if true the led is switched on, if false it is switched off
      * @throws IOException
      */
-    public void setLed(int row, int col, boolean state) throws IOException {
-        byte val;
-
+    public void setLed(int addr, int row, int col, boolean state) throws IOException {
+        if (addr < 0 || addr >= maxDevices) {
+            return;
+        }
         if (row < 0 || row > 7 || col < 0 || col > 7) {
             return;
         }
-        val = (byte) (0b10000000 >> col);
+
+        int offset = addr * 8;
+        byte val = (byte) (0b10000000 >> col);
         if (state) {
-            status[row] = (byte) (status[row] | val);
+            status[offset + row] = (byte) (status[offset + row] | val);
         } else {
             val = (byte) ~val;
-            status[row] = (byte) (status[row] & val);
+            status[offset + row] = (byte) (status[offset + row] & val);
         }
-        spiTransfer((byte) (row + 1), status[row]);
+        spiTransfer(addr, (byte) (OP_DIGIT0 + row), status[offset + row]);
     }
 
     /**
      * Set all 8 Led's in a row to a new state
      *
+     * @param addr  the address of the display to control
      * @param row   row which is to be set (0..7)
      * @param value each bit set to 1 will light up the corresponding Led.
      */
-    public void setRow(int row, byte value) throws IOException {
+    public void setRow(int addr, int row, byte value) throws IOException {
+        if (addr < 0 || addr >= maxDevices) {
+            return;
+        }
         if (row < 0 || row > 7) {
             return;
         }
 
-        status[row] = value;
-        spiTransfer((byte) (OP_DIGIT0 + row), status[row]);
+        int offset = addr * 8;
+        status[offset + row] = value;
+        spiTransfer(addr, (byte) (OP_DIGIT0 + row), status[offset + row]);
     }
 
     /**
      * Set all 8 Led's in a column to a new state
      *
+     * @param addr  the address of the display to control
      * @param col   column which is to be set (0..7)
      * @param value each bit set to 1 will light up the corresponding Led.
      */
-    public void setColumn(int col, byte value) throws IOException {
-        byte val;
-
+    public void setColumn(int addr, int col, byte value) throws IOException {
+        if (addr < 0 || addr >= maxDevices) {
+            return;
+        }
         if (col < 0 || col > 7) {
             return;
         }
+
+        byte val;
         for (int row = 0; row < 8; row++) {
             val = (byte) (value >> (7 - row));
-            setLed(row, col, (val & 0x01) == 0x01);
+            setLed(addr, row, col, (val & 0x01) == 0x01);
         }
     }
 
     /**
      * Display a hexadecimal digit on a 7-Segment Display
      *
+     * @param addr  the address of the display to control
      * @param digit the position of the digit on the display (0..7)
      * @param value the value to be displayed. (0x00..0x0F. 0x10 to clear digit)
      * @param dp    sets the decimal point.
      */
-    public void setDigit(int digit, byte value, boolean dp) throws IOException {
-        byte v;
-
+    public void setDigit(int addr, int digit, byte value, boolean dp) throws IOException {
+        if (addr < 0 || addr >= maxDevices) {
+            return;
+        }
         if (digit < 0 || digit > 7 || value > 16) {
             return;
         }
-        v = CHAR_TABLE[value];
+
+        int offset = addr * 8;
+        byte v = CHAR_TABLE[value];
         if (dp) {
             v |= 0b10000000;
         }
-        status[digit] = v;
-        spiTransfer((byte) (digit + 1), v);
+        status[offset + digit] = v;
+        spiTransfer(addr, (byte) (OP_DIGIT0 + digit), v);
     }
 
     /**
@@ -217,49 +273,69 @@ public class LedControl implements AutoCloseable {
      * '.','-','_',' '
      * </pre>
      *
+     * @param addr  the address of the display to control
      * @param digit the position of the character on the display (0..7)
      * @param value the character to be displayed.
      * @param dp    sets the decimal point.
      */
-    public void setChar(int digit, char value, boolean dp) throws IOException {
-        byte index;
-        byte v;
-
+    public void setChar(int addr, int digit, char value, boolean dp) throws IOException {
+        if (addr < 0 || addr >= maxDevices) {
+            return;
+        }
         if (digit < 0 || digit > 7) {
             return;
         }
-        index = (byte) value;
-        v = CHAR_TABLE[index];
+
+        int offset = addr * 8;
+        int index = value;
+        if (index >= CHAR_TABLE.length) {
+            // no defined beyond index 127, so we use the space char
+            index = 32;
+        }
+        byte v = CHAR_TABLE[index];
         if (dp) {
             v |= 0b10000000;
         }
-        status[digit] = v;
-        spiTransfer((byte) (digit + 1), v);
+        status[offset + digit] = v;
+        spiTransfer(addr, (byte) (OP_DIGIT0 + digit), v);
     }
 
     /**
      * Draw the given bitmap to the LED matrix.
      *
+     * @param addr   the address of the display to control
      * @param bitmap Bitmap to draw
      * @throws IOException
      */
-    public void draw(Bitmap bitmap) throws IOException {
+    public void draw(int addr, Bitmap bitmap) throws IOException {
+        if (addr < 0 || addr >= maxDevices) {
+            return;
+        }
+
         Bitmap scaled = Bitmap.createScaledBitmap(bitmap, 8, 8, true);
         for (int row = 0; row < 8; row++) {
             int value = 0;
             for (int col = 0; col < 8; col++) {
                 value |= scaled.getPixel(col, row) == Color.WHITE ? (0x80 >> col) : 0;
             }
-            setRow(row, (byte) value);
+            setRow(addr, row, (byte) value);
         }
     }
 
     /**
      * Send out a single command to the device
      */
-    private void spiTransfer(byte opcode, int data) throws IOException {
-        spidata[0] = opcode;
-        spidata[1] = (byte) data;
-        spiDevice.write(spidata, 2);
+    private void spiTransfer(int addr, byte opcode, int data) throws IOException {
+        int offset = addr * 2;
+        int maxbytes = maxDevices * 2;
+
+        for (int i = 0; i < maxbytes; i++) {
+            spidata[i] = (byte) 0;
+        }
+
+        // put our device data into the array
+        spidata[maxbytes - offset - 2] = opcode;
+        spidata[maxbytes - offset - 1] = (byte) data;
+        spiDevice.write(spidata, maxbytes);
     }
 }

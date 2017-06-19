@@ -112,10 +112,33 @@ public class Invaders {
             (byte) 0b00000000
     };
 
-    public static final byte[][] FRAMES = new byte[][]{
-            ALIEN_1_FRAME_1, ALIEN_1_FRAME_1, ALIEN_1_FRAME_2, ALIEN_1_FRAME_2, ALIEN_1_FRAME_1, ALIEN_1_FRAME_1, ALIEN_1_FRAME_2, ALIEN_1_FRAME_2,
+    private static final byte[][] FRAMES_ALIEN1 = new byte[][]{
+            ALIEN_1_FRAME_1, ALIEN_1_FRAME_1, ALIEN_1_FRAME_2, ALIEN_1_FRAME_2, ALIEN_1_FRAME_1, ALIEN_1_FRAME_1, ALIEN_1_FRAME_2, ALIEN_1_FRAME_2
+    };
+
+    private static final byte[][] FRAMES_ALIEN2 = new byte[][]{
             ALIEN_2_FRAME_1, ALIEN_2_FRAME_1, ALIEN_2_FRAME_2, ALIEN_2_FRAME_2, ALIEN_2_FRAME_1, ALIEN_2_FRAME_1, ALIEN_2_FRAME_2, ALIEN_2_FRAME_2,
+    };
+
+    private static final byte[][] FRAMES_ALIEN3 = new byte[][]{
             ALIEN_3_FRAME_1, ALIEN_3_FRAME_1, ALIEN_3_FRAME_2, ALIEN_3_FRAME_2, ALIEN_3_FRAME_1, ALIEN_3_FRAME_1, ALIEN_3_FRAME_2, ALIEN_3_FRAME_2,
+    };
+
+    private static final byte[][] FRAMES_ALIEN4 = new byte[][]{
             ALIEN_4_FRAME_1, ALIEN_4_FRAME_2, ALIEN_4_FRAME_3, ALIEN_4_FRAME_4, ALIEN_4_FRAME_1, ALIEN_4_FRAME_2, ALIEN_4_FRAME_3, ALIEN_4_FRAME_4
     };
+
+    public static final byte[][][] FRAMES_ALIENS = new byte[][][]{
+            FRAMES_ALIEN1, FRAMES_ALIEN2, FRAMES_ALIEN3, FRAMES_ALIEN4
+    };
+
+    public static final byte[][] FRAMES = new byte[FRAMES_ALIEN1.length + FRAMES_ALIEN2.length + FRAMES_ALIEN3.length + FRAMES_ALIEN4.length][8];
+
+    static {
+        int framesSize = 0;
+        for (byte[][] framesAlien : FRAMES_ALIENS) {
+            System.arraycopy(framesAlien, 0, FRAMES, framesSize, framesAlien.length);
+            framesSize += framesAlien.length;
+        }
+    }
 }
