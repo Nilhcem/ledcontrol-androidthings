@@ -1,4 +1,4 @@
-package com.nilhcem.ledcontrol;
+package com.nilhcem.androidthings.driver.max72xx.sample;
 
 public class Invaders {
 

@@ -1,13 +1,16 @@
-# MAX7219 Led Matrix Module sample for Android Things
+# MAX7219 / MAX7221 driver for Android Things
 
-- Android Things Port of the Arduino LedControl library
-- Sample project
+A port of the LedControl Arduino library for Android Things.
 
 ![photo][]
 
-## Schematic
+## Download
 
-![schematic][]
+```groovy
+dependencies {
+    compile 'com.nilhcem.androidthings:driver-max72xx:0.0.1'
+}
+```
 
 ## Usage
 
@@ -40,6 +43,14 @@ ledControl.setLed(0, 2, 3, true);
 ```java
 Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.smiley);
 ledControl.draw(0, bmp);
+```
+
+
+### Draw a single bitmap on multiple devices
+```java
+// Here, we're drawing a [width=32, height=8] bitmap on a "4 in 1" display module
+Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.hearts32x8);
+ledControl.draw(bmp);
 ```
 
 
@@ -79,24 +90,13 @@ for (int i = 0; i < 8; i++) {
 ```
 
 
+## Schematic
+
+![schematic][]
+
+
 Credits to [https://learn.adafruit.com/trinket-slash-gemma-space-invader-pendant/animation](https://learn.adafruit.com/trinket-slash-gemma-space-invader-pendant/animation) for the Space invaders animation
 
 
-## License
-
-```
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-```
-
-[photo]: https://raw.githubusercontent.com/Nilhcem/ledcontrol-androidthings/master/preview.gif
-[schematic]: https://raw.githubusercontent.com/Nilhcem/ledcontrol-androidthings/master/schematic.png
+[photo]: https://raw.githubusercontent.com/Nilhcem/ledcontrol-androidthings/master/assets/preview.gif
+[schematic]: https://raw.githubusercontent.com/Nilhcem/ledcontrol-androidthings/master/assets/schematic.png

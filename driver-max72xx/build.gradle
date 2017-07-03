@@ -1,0 +1,34 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.novoda:bintray-release:0.5.0'
+    }
+}
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+    }
+}
+
+dependencies {
+    provided rootProject.ext.dependencies['androidthings']
+}
+
+publish {
+    userOrg = 'nilhcem'
+    groupId = 'com.nilhcem.androidthings'
+    artifactId = 'driver-max72xx'
+    publishVersion = '0.0.1'
+    desc = 'Android Things driver for the MAX7219 and MAX7221.'
+    website = 'https://github.com/Nilhcem/ledcontrol-androidthings'
+}

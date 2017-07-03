@@ -1,4 +1,4 @@
-package com.nilhcem.ledcontrol;
+package com.nilhcem.androidthings.driver.max72xx.sample;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -7,11 +7,13 @@ import android.os.HandlerThread;
 import android.os.Message;
 import android.util.Log;
 
+import com.nilhcem.androidthings.driver.max72xx.LedControl;
+
 import java.io.IOException;
 
-public class MainActivity extends Activity {
+public class SampleActivity extends Activity {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = SampleActivity.class.getSimpleName();
     private static final int NB_DEVICES = 1;
 
     private static final int HANDLER_MSG_SHOW = 1;
