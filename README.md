@@ -95,8 +95,9 @@ for (int i = 0; i < 8; i++) {
 ![schematic][]
 
 
-Credits to [https://learn.adafruit.com/trinket-slash-gemma-space-invader-pendant/animation](https://learn.adafruit.com/trinket-slash-gemma-space-invader-pendant/animation) for the Space invaders animation
-
+Credits to [https://learn.adafruit.com/trinket-slash-gemma-space-invader-pendant/animation][invaders] for the Space invaders animation, [http://wdi.supelec.fr/boulanger/MicroPython/][fritzing] for the fritzing part.
 
 [photo]: https://raw.githubusercontent.com/Nilhcem/ledcontrol-androidthings/master/assets/preview.gif
 [schematic]: https://raw.githubusercontent.com/Nilhcem/ledcontrol-androidthings/master/assets/schematic.png
+[invaders]: https://learn.adafruit.com/trinket-slash-gemma-space-invader-pendant/animation
+[fritzing]: http://wdi.supelec.fr/boulanger/MicroPython/
