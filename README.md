@@ -54,16 +54,6 @@ ledControl.draw(bmp);
 ```
 
 
-### Show a space invader on matrix #0
-
-```java
-byte[] invader = Invaders.ALIEN_1_FRAME_1;
-for (int i = 0; i < invader.length; i++) {
-    ledControl.setRow(0, i, invader[i]);
-}
-```
-
-
 ### Show "42.ABCDEF" on a MAX7219 8-digit module
 
 ```java
