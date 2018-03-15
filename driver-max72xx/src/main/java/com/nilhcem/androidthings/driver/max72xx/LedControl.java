@@ -3,7 +3,7 @@ package com.nilhcem.androidthings.driver.max72xx;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 
-import com.google.android.things.pio.PeripheralManagerService;
+import com.google.android.things.pio.PeripheralManager;
 import com.google.android.things.pio.SpiDevice;
 
 import java.io.IOException;
@@ -63,8 +63,8 @@ public class LedControl implements AutoCloseable {
     private int maxDevices;
 
     public LedControl(String spiGpio, int numDevices) throws IOException {
-        PeripheralManagerService pioService = new PeripheralManagerService();
-        spiDevice = pioService.openSpiDevice(spiGpio);
+        PeripheralManager manager = PeripheralManager.getInstance();
+        spiDevice = manager.openSpiDevice(spiGpio);
         spiDevice.setMode(SpiDevice.MODE0);
         spiDevice.setFrequency(1000000); // 1MHz
         spiDevice.setBitsPerWord(8); // 8 BPW
