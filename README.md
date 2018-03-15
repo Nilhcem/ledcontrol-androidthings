@@ -8,7 +8,7 @@ A port of the LedControl Arduino library for Android Things.
 
 ```groovy
 dependencies {
-    compile 'com.nilhcem.androidthings:driver-max72xx:0.0.1'
+    compile 'com.nilhcem.androidthings:driver-max72xx:0.0.2'
 }
 ```
 
