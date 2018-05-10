@@ -68,7 +68,7 @@ public class LedControl implements AutoCloseable {
         spiDevice.setMode(SpiDevice.MODE0);
         spiDevice.setFrequency(1000000); // 1MHz
         spiDevice.setBitsPerWord(8); // 8 BPW
-        spiDevice.setBitJustification(false); // MSB first
+        spiDevice.setBitJustification(SpiDevice.BIT_JUSTIFICATION_MSB_FIRST); // MSB first
 
         maxDevices = numDevices;
         if (numDevices < 1 || numDevices > 8) {
