@@ -1,0 +1,29 @@
+{
+  "title": "MAX72xx",
+  "category": "LED Matrix",
+  "samples": [
+    "https://github.com/Nilhcem/ledcontrol-androidthings/tree/master/sample"
+  ],
+  "published-maven": {
+    "maven-url": "https://jcenter.bintray.com",
+    "groupid": "com.nilhcem.androidthings",
+    "artifactid": "driver-max72xx"
+  },
+  "compatible-with": [
+    {
+      "title": "LED Display Driver (8-Digit) - MAX7219CNG",
+      "photo": "https://cdn.sparkfun.com//assets/parts/3/4/5/3/09622-01.jpg",
+      "url": "https://www.sparkfun.com/products/9622"
+    },
+    {
+      "title": "MAX7219 Dot Matrix Module",
+      "photo": "http://nilhcem.com/public/images/20170327/05_max7219.jpg",
+      "url": "https://aliexpress.com/wholesale?SearchText=max7219+matrix"
+    },
+    {
+      "title": "MAX7219 8-Digit 7 Segment Digital LED Display",
+      "photo": "http://arduinolearning.com/wp-content/uploads/2016/10/MAX7219-seven-segment-display.jpg",
+      "url": "https://aliexpress.com/wholesale?SearchText=max7219+segment"
+    }
+  ]
+}
