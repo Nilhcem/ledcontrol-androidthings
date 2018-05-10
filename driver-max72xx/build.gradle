@@ -28,7 +28,7 @@ publish {
     userOrg = 'nilhcem'
     groupId = 'com.nilhcem.androidthings'
     artifactId = 'driver-max72xx'
-    publishVersion = '0.0.2'
+    publishVersion = '0.0.3'
     desc = 'Android Things driver for the MAX7219 and MAX7221.'
     website = 'https://github.com/Nilhcem/ledcontrol-androidthings'
 }
